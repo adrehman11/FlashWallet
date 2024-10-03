@@ -17,6 +17,7 @@ require("dotenv").config();
 const axios = require('axios');
 const sgMail = require("@sendgrid/mail");
 const moment = require('moment');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const {CheckTransectionHistory}  = require("../Helper/Web3Function")
 exports.createUser = async (req, res) => {
@@ -33,7 +34,6 @@ exports.createUser = async (req, res) => {
         let otpCode = await otp_code()
         let otpCode_timestamp= Date.now()
         await User.update({otpCode:otpCode,otpCode_timestamp:otpCode_timestamp},{where:{email:req.body.email}})
-        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
          const msg = {
             to: req.body.email,
@@ -171,7 +171,6 @@ exports.resendOTP = async (req, res) => {
         otpCode,
         },
     };
-
   await sgMail.send(msg);
       return res.status(200).json({
         msg: "OTP Sended",
