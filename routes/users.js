@@ -8,14 +8,15 @@ const {
   setReferralCode,
   secret_phrase_1,
   secret_phrase_2,
-  secret_phrase_3
+  secret_phrase_3,
+  resendOTP
 
 } = require("../middlewares/validations");
 const authMiddleware = require("../middlewares/validations/auth");
 
 Router.post("/signup",signup, UserController.createUser );
-Router.post("/login",login, UserController.login );
 Router.post("/verify/otp",verifyOtp, UserController.OtpCodeVerification);
+Router.post("/resend/otp",resendOTP, UserController.resendOTP);
 Router.post("/secret_phrase_1",authMiddleware,secret_phrase_1,UserController.secret_phrase_1)
 Router.post("/secret_phrase_2",authMiddleware,secret_phrase_2,UserController.secret_phrase_2)
 Router.post("/secret_phrase_3",authMiddleware,secret_phrase_3,UserController.secret_phrase_3)

@@ -30,18 +30,30 @@ exports.createUser = async (req, res) => {
       });
       
       if (exist) {
-        return res.status(401).json({
-          msg: "The Email entered already exisits in our system.Please choose a new one!",
+        let otpCode = await otp_code()
+        let otpCode_timestamp= Date.now()
+        await User.update({otpCode:otpCode,otpCode_timestamp:otpCode_timestamp},{where:{email:req.body.email}})
+        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+         const msg = {
+            to: req.body.email,
+            from: {
+               email: process.env.SENDER_EMAIL,
+                name: process.env.SENDER_NAME,
+             },
+            templateId: process.env.SINGUP_OTP_EMAIL_TEMPLATE_ID,
+            dynamicTemplateData: {
+            otpCode,
+            },
+        };
+
+      await sgMail.send(msg);
+        return res.status(200).json({
+          msg: "OTP Sended",
+          // token:token
         });
       }
       const user = await User.create(req.body);
-      if (!user) {
-        return res.status(400).json({ msg: "User Not Created" });
-      }
-      // const secret =process.env.jwtSecret
-      // const token = JWT.sign({
-      //   id: user.id,
-      //  }, secret, { expiresIn: '3650d' });
       if (req.body.referralCode) {
         const user1 = await User.findOne({
           attributes: ["id"],
@@ -57,27 +69,27 @@ exports.createUser = async (req, res) => {
       }
     
 
-    // const msg = {
-    //   to: req.body.email,
-    //   from: {
-    //     email: process.env.SENDER_EMAIL,
-    //     name: process.env.SENDER_NAME,
-    //   },
-    //   templateId: process.env.SINGUP_OTP_EMAIL_TEMPLATE_ID,
-    //   dynamicTemplateData: {
-    //     otpCode,
-    //   },
-    // };
-
-    // await sgMail.send(msg);
+   
     }
-    // sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     // const link = `${process.env.FRONTEND_SINGUP_VERIFY_LINK}/?token=${token}`;
     let otpCode = await otp_code()
     let otpCode_timestamp= Date.now()
     await User.update({otpCode:otpCode,otpCode_timestamp:otpCode_timestamp},{where:{email:req.body.email}})
+    const msg = {
+      to: req.body.email,
+      from: {
+         email: process.env.SENDER_EMAIL,
+          name: process.env.SENDER_NAME,
+       },
+      templateId: process.env.SINGUP_OTP_EMAIL_TEMPLATE_ID,
+      dynamicTemplateData: {
+      otpCode,
+      },
+  };
+
+await sgMail.send(msg);
     return res.status(200).json({
-        msg: "User Created",
+        msg: "OTP Sended",
         // token:token
       });
     } catch (error) {
@@ -86,34 +98,7 @@ exports.createUser = async (req, res) => {
       return res.status(500).json({ msg: error.message });
     }
 };
-exports.login = async (req, res) => {
-  try {
-    
-    const exist = await User.findOne({
-      attributes: ["id"],
-      where: {
-        email: req.body.email,
-      },
-    });
-    
-    if (!exist) {
-      return res.status(401).json({
-        msg: "Email not found",
-      });
-    }
-    
-  let otpCode = await otp_code()
-  let otpCode_timestamp= Date.now()
-  await User.update({otpCode:otpCode,otpCode_timestamp:otpCode_timestamp},{where:{email:req.body.email}})
-  return res.status(200).json({
-      msg: "Otp Code sended on email",
-    });
-  } catch (error) {
-    console.log("Error in Create::::", error);
-    if (res.headersSent) return;
-    return res.status(500).json({ msg: error.message });
-  }
-};
+
 
 exports.OtpCodeVerification = async (req, res) => {
     try {
@@ -151,6 +136,53 @@ exports.OtpCodeVerification = async (req, res) => {
     }
 };
 
+exports.resendOTP = async (req, res) => {
+  try {
+    const user = await User.findOne({
+      where: { email: req.body.email },
+    }); // finding User In DB
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: false, msg: "No user Found" });
+    }
+
+    if(user.otpCode_timestamp )
+    {
+      const now = moment(Date.now());
+      const expDate = moment(parseInt(user.otpCode_timestamp, 10));
+      const duration = moment.duration(now.diff(expDate));
+      const elapsedTime = duration.asMinutes();
+      if (elapsedTime < 10) {
+        return res.status(400).json({ msg: 'OTP email already sended to your email' });
+      }
+    }
+      let otpCode = await otp_code()
+      let otpCode_timestamp= Date.now()
+      await User.update({otpCode:otpCode,otpCode_timestamp:otpCode_timestamp},{where:{email:req.body.email}})
+      const msg = {
+        to: req.body.email,
+        from: {
+           email: process.env.SENDER_EMAIL,
+            name: process.env.SENDER_NAME,
+         },
+        templateId: process.env.SINGUP_OTP_EMAIL_TEMPLATE_ID,
+        dynamicTemplateData: {
+        otpCode,
+        },
+    };
+
+  await sgMail.send(msg);
+      return res.status(200).json({
+        msg: "OTP Sended",
+        // token:token
+      });
+
+  } catch (error) {
+    console.log("error in link verification:::::", error);
+    return res.status(500).json({ msg: error.message });
+  }
+};
 exports.secret_phrase_1 = async (req,res) =>{
   try
   {

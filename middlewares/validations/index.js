@@ -89,3 +89,16 @@ exports.verifyOtp = (req, res, next) => {
     next();
   }
 };
+
+const resendOTPSchema = JOI.object().keys({
+  email: JOI.string().regex(/[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9!#$%&'*+/=?^_`{|}~-]+\.[a-z0-9]{2,3}/).required()
+});
+
+exports.resendOTP = (req, res, next) => {
+  const result = resendOTPSchema.validate(req.body);
+  if (result.error) {
+    return res.status(400).json({ msg: result.error.message });
+  } else {
+    next();
+  }
+};
