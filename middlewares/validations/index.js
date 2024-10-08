@@ -28,6 +28,7 @@ exports.login = (req, res, next) => {
 
 const setReferralCodeSchema = JOI.object().keys({
   code: JOI.string().required().min(6).max(6),
+  walletAddress: JOI.string().required()
 });
 
 exports.setReferralCode = (req, res, next) => {

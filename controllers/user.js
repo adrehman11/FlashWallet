@@ -118,7 +118,7 @@ exports.OtpCodeVerification = async (req, res) => {
       const expDate = moment(parseInt(user.otpCode_timestamp, 10));
       const duration = moment.duration(now.diff(expDate));
       const elapsedTime = duration.asMinutes();
-      if (elapsedTime > 10) {
+      if (elapsedTime > 2) {
         return res.status(400).json({ msg: 'Code expired. Please request for new code.' });
       }
       if (req.body.otpCode !== user.otpCode) {
@@ -153,7 +153,7 @@ exports.resendOTP = async (req, res) => {
       const expDate = moment(parseInt(user.otpCode_timestamp, 10));
       const duration = moment.duration(now.diff(expDate));
       const elapsedTime = duration.asMinutes();
-      if (elapsedTime < 10) {
+      if (elapsedTime < 2) {
         return res.status(400).json({ msg: 'OTP email already sended to your email' });
       }
     }
@@ -281,11 +281,11 @@ exports.setReferralCode = async (req, res) => {
       
       if (!exist) {
         return res.status(401).json({
-          msg: "No wallet Address found ",
+          msg: "No user found ",
         });
       }
       await User.update(
-        { referral_code: req.body.code },
+        { referral_code: req.body.code ,walletAddress:req.body.walletAddress},
         { where: { id: user.id } }
       );
     return res.status(200).json({
