@@ -6,6 +6,7 @@ const {
     SecretPhrase2,
     SecretPhrase3,
     Sequelize,
+    FlashPoints,
     sequelize
   } = require("../model/db");
 
@@ -47,7 +48,6 @@ exports.createUser = async (req, res) => {
             },
         };
 
-      await sgMail.send(msg);
         return res.status(200).json({
           msg: "OTP Sended",
           // token:token
@@ -64,8 +64,21 @@ exports.createUser = async (req, res) => {
             user1: user1.id,
             user2: user.id,
           });
-
-          // let checkTransectionsHistory = await CheckTransectionHistory (req.body.walletAddress);
+      // if(!user1.isActive)
+      // {
+      //   let chainArray = [{chain:`ethereum(network: ethereum)`,symbol:"ethereum"},{chain:`bsc: ethereum(network: bsc)`,symbol:"bsc"},{chain:`polygon: ethereum(network: polygon)",symbol:"polygon`}]
+      //   for (let i =0 ; i < chainArray.length ; i ++)
+      //   {
+      //     let checkTransectionsHistoryData = await CheckTransectionHistory (user1.walletAddress,chainArray[i]);
+      //     if(checkTransectionsHistoryData)
+      //     {
+      //       await User.update({isActive:true},{where:{id:user1.id}})
+      //       break ;
+      //     }
+      //   }
+      // }
+      
+     
       }
     
 
@@ -102,9 +115,8 @@ await sgMail.send(msg);
 
 exports.OtpCodeVerification = async (req, res) => {
     try {
-      
-      const user = await User.findOne({
-        where: { email: req.body.email },
+      let user = await User.findOne({
+        where: { email: req.body.email},
       }); // finding User In DB
       if (!user) {
         return res
@@ -129,6 +141,9 @@ exports.OtpCodeVerification = async (req, res) => {
         id: user.id,
        }, secret, { expiresIn: '3650d' });
       
+       //login work
+       await User.update({isLogin: true},{where:{id:user.id}})
+       console.log(user.id)
       return res.status(200).json({ msg: "Verified",token:token });
     } catch (error) {
       console.log("error in link verification:::::", error);
@@ -306,6 +321,18 @@ exports.checkTransection = async (req, res) => {
       
     } catch (error) {
       console.log("Error in Create::::", error);
+      return res.status(500).json({ msg: error.message });
+    }
+  };
+
+  exports.logout = async (req, res) => {
+    try {
+      let user = req.user
+      await User.update({  isLogin:false}, { where: { id: user.id } });
+      return res.status(200).json({logoutStatus:true});
+      
+    } catch (error) {
+      console.log("Error in Logout:::", error);
       return res.status(500).json({ msg: error.message });
     }
   };

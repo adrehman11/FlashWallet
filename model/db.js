@@ -5,6 +5,7 @@ const ReferralHistoryModel = require("./ReferralHistory");
 const SecretPhrase1Model = require("./SecretPhrase1");
 const SecretPhrase2Model = require("./SecretPhrase2");
 const SecretPhrase3Model = require("./SecretPhrase3");
+const FlashPointsModel = require("./FlashPoints");
 
 
 var sequelize;
@@ -48,6 +49,7 @@ const User = userModel(sequelize);
 const SecretPhrase1 = SecretPhrase1Model(sequelize);
 const SecretPhrase2 = SecretPhrase2Model(sequelize);
 const SecretPhrase3 = SecretPhrase3Model(sequelize);
+const FlashPoints = FlashPointsModel(sequelize);
 
 
 
@@ -113,6 +115,17 @@ sequelize
       onUpdate: "CASCADE",
     });
 
+    FlashPoints.belongsTo(User, {
+      foreignKey: "user_id",
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(FlashPoints, {
+      foreignKey: "user_id",
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+
     await sequelize.sync();
   })
   .catch((error) => {
@@ -126,5 +139,6 @@ module.exports = {
   ReferralHistory,
   SecretPhrase3,
   SecretPhrase2,
-  SecretPhrase1
+  SecretPhrase1,
+  FlashPoints
 };

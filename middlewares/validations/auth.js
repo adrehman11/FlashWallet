@@ -15,11 +15,12 @@ module.exports = async (req, res, next) => {
     let user = await User.findOne({
       where: {
         id: decoded.id,
+        isLogin:true
       }
     });
     if (!user) {
       return res.status(401).json({
-        msg: "No User Found",
+        msg: "UnAuthorized Please Login Again",
         logoutStatus: true,
       });
     }

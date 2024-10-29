@@ -7,6 +7,10 @@ const userModel = (sequelize) => {
         default:null
 
       },
+      isActive:{
+        type: Sequelize.BOOLEAN,
+        default:false
+      },
       otpCode: {
         type: Sequelize.INTEGER,
       },
@@ -30,6 +34,11 @@ const userModel = (sequelize) => {
       walletAddress:{
         type: Sequelize.STRING,
         default:null
+
+      },
+      isLogin:{
+        type: Sequelize.BOOLEAN,
+        default:false
 
       }
 
