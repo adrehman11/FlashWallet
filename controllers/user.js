@@ -23,14 +23,12 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const {CheckTransectionHistory}  = require("../Helper/Web3Function")
 exports.createUser = async (req, res) => {
     try {
-      
       const exist = await User.findOne({
         attributes: ["id"],
         where: {
           email: req.body.email,
         },
       });
-      
       if (exist) {
         let otpCode = await otp_code()
         let otpCode_timestamp= Date.now()
@@ -47,12 +45,13 @@ exports.createUser = async (req, res) => {
             otpCode,
             },
         };
-
+         let c =await sgMail.send(msg);
         return res.status(200).json({
           msg: "OTP Sended",
           // token:token
         });
       }
+
       const user = await User.create(req.body);
       if (req.body.referralCode) {
         const user1 = await User.findOne({
@@ -99,8 +98,10 @@ exports.createUser = async (req, res) => {
       otpCode,
       },
   };
+  console.log("adasdasd")
 
-await sgMail.send(msg);
+let c = await sgMail.send(msg);
+console.log(c)
     return res.status(200).json({
         msg: "OTP Sended",
         // token:token
