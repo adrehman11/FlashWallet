@@ -68,39 +68,74 @@ async function CheckNftHistory (walletAddress,contractAddress)
 {
   try
   {
-    const query = `{
-      EVM(dataset: combined, network: polygon) {
-        Transfers(
-          limit: {count: 100}
-          where: {
-            Currency: {
-              SmartContract: {is: "${contractAddress}"}
-            }
-            OR: [
-              {Receiver: {is: "${walletAddress}"}}
-            ]
-          }
+    const query = 
+    `{
+      ethereum(network: matic) {
+        transfers(
+          options: {limit: 100, desc: "block.height"} # Get latest transactions first
+          smartContractAddress: {is: "${contractAddress}"}
+          currency: {type: {is: "ERC721"}} # Target ERC721 NFTs
+          any: [
+            {receiver: {is: "${walletAddress}"}},
+          ]
         ) {
-          Currency {
-            Name
-            SmartContract {
-              Address
+          currency {
+            name
+            symbol
+            address
+            tokenId
+          }
+          receiver {
+            address
+          }
+          sender {
+            address
+          }
+          transaction {
+            hash
+          }
+          block {
+            height
+            timestamp {
+              time
             }
-            Symbol
-          }
-          Receiver
-          Sender
-          Amount
-          Transaction {
-            Hash
-          }
-          Block {
-            Number
-            Time
           }
         }
       }
     }`;
+    // `{
+    //   EVM(dataset: combined, network: polygon) {
+    //     Transfers(
+    //       limit: {count: 100}
+    //       where: {
+    //         Currency: {
+    //           SmartContract: {is: "${contractAddress}"}
+    //         }
+    //         OR: [
+    //           {Receiver: {is: "${walletAddress}"}}
+    //         ]
+    //       }
+    //     ) {
+    //       Currency {
+    //         Name
+    //         SmartContract {
+    //           Address
+    //         }
+    //         Symbol
+    //       }
+    //       Receiver
+    //       Sender
+    //       Amount
+    //       Transaction {
+    //         Hash
+    //       }
+    //       Block {
+    //         Number
+    //         Time
+    //       }
+    //     }
+    //   }
+    // }`;
     const response = await axios.post(
       'https://graphql.bitquery.io',
       { query },
@@ -111,8 +146,7 @@ async function CheckNftHistory (walletAddress,contractAddress)
         },
       }
     );
-    console.log(response)
-    console.log(response.data.errors)
+    console.log(response.data.errors[0])
     
   }
   catch(error)
@@ -121,7 +155,7 @@ async function CheckNftHistory (walletAddress,contractAddress)
   }
 }
 // setTimeout(async ()  =>  {
-//   let c = await CheckNftHistory("0xB09540Cdb198d8ae82710e95c53C6CDebc7680a8","0x0054ef36214005b3F3878536b07900002EB7f46C")
+//   let c = await CheckTransectionHistory("0x02E7ABE4A3644134Bb06b9Be2629B19A7811B736",{chain:`ethereum(network: ethereum)`,symbol:"ethereum"})
 //   console.log(c)
 //   }, 3000);
 

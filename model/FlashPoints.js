@@ -4,6 +4,9 @@ const FlashPointsModel = (sequelize) => {
     const FlashPoints = sequelize.define('FlashPoints', {
         points :{
             type: Sequelize.INTEGER,
+        },
+        description : {
+            type:Sequelize.STRING
         }
     }, { timestamps: true });
     return FlashPoints;

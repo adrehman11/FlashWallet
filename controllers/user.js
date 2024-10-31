@@ -101,7 +101,6 @@ exports.createUser = async (req, res) => {
   console.log("adasdasd")
 
 let c = await sgMail.send(msg);
-console.log(c)
     return res.status(200).json({
         msg: "OTP Sended",
         // token:token
@@ -312,19 +311,7 @@ exports.setReferralCode = async (req, res) => {
       return res.status(500).json({ msg: error.message });
     }
   };
-  
 
-exports.checkTransection = async (req, res) => {
-    try {
-
-      
-      return res.status(200).json({ msg:"checked" });
-      
-    } catch (error) {
-      console.log("Error in Create::::", error);
-      return res.status(500).json({ msg: error.message });
-    }
-  };
 
   exports.logout = async (req, res) => {
     try {
@@ -337,3 +324,41 @@ exports.checkTransection = async (req, res) => {
       return res.status(500).json({ msg: error.message });
     }
   };
+
+  exports.topReferrals = async (req,res) => {
+    try{
+      let user = req.user
+      let pointsLeaderBoard = await FlashPoints.findAll({
+        where: {
+          points: { [Op.gt]: 0 },
+        },
+        attributes: [
+          [sequelize.fn("SUM", sequelize.col("points")), "totalPoints"],
+        ],
+        limit: 100,
+        offset: 0,
+        include: [
+          {
+            model: User,
+            attributes: ["full_name", "email", "walletAddress", "id"],
+            required: true,
+          },
+        ],
+        group: [["user_id"]],
+        order: [[sequelize.literal("totalPoints"), "DESC"]],
+      });
+      if(pointsLeaderBoard.length > 0)
+      {
+        return res.status(200).json(pointsLeaderBoard);
+      }
+      else
+      {
+        return res.status(200).json({msg:"No data Found"});
+      }
+    }
+    catch(error)
+    {
+      console.log("Error in Top Referrals:::", error);
+      return res.status(500).json({ msg: error.message });
+    }
+  }

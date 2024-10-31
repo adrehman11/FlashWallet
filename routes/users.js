@@ -23,7 +23,7 @@ Router.post("/secret_phrase_3",authMiddleware,secret_phrase_3,UserController.sec
 Router.get("/secret_phrase",authMiddleware,UserController.get_secret_phrase)
 
 Router.post("/setReferralCode",authMiddleware,setReferralCode, UserController.setReferralCode );
-// Router.get("checkTransections",UserController.setReferralCode)
+Router.get("/topReferrals",authMiddleware,UserController.topReferrals)
 Router.get("/logout",authMiddleware,UserController.logout)
 
 
