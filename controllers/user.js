@@ -20,13 +20,14 @@ const sgMail = require("@sendgrid/mail");
 const moment = require('moment');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const {CheckTransectionHistory}  = require("../Helper/Web3Function")
-exports.createUser = async (req, res) => {
+const {verifyEthSign}  = require("../Helper/Web3Function")
+exports.createUserMPC = async (req, res) => {
     try {
       const exist = await User.findOne({
         attributes: ["id"],
         where: {
           email: req.body.email,
+          isMPC:true
         },
       });
       if (exist) {
@@ -45,14 +46,17 @@ exports.createUser = async (req, res) => {
             otpCode,
             },
         };
-         let c =await sgMail.send(msg);
+         await sgMail.send(msg);
         return res.status(200).json({
           msg: "OTP Sended",
           // token:token
         });
       }
 
-      const user = await User.create(req.body);
+      const user = await User.create({
+        email:req.body.email,
+        isMPC: true
+      });
       if (req.body.referralCode) {
         const user1 = await User.findOne({
           attributes: ["id"],
@@ -98,9 +102,8 @@ exports.createUser = async (req, res) => {
       otpCode,
       },
   };
-  console.log("adasdasd")
 
-let c = await sgMail.send(msg);
+    await sgMail.send(msg);
     return res.status(200).json({
         msg: "OTP Sended",
         // token:token
@@ -112,11 +115,75 @@ let c = await sgMail.send(msg);
     }
 };
 
+exports.createUserImportedWallet = async (req, res) => {
+  try {
+    let verifyRSVToken = await verifyEthSign(req.body.walletAddress,req.body.sign)
+    console.log(verifyRSVToken)
+    if(!verifyRSVToken)
+    {
+      return res.status(400).json({
+        msg: "Invalid Sign",
+      });
+    }
+    const exist = await User.findOne({
+      where: {
+        walletAddress: req.body.walletAddress,
+        isMPC:false
+      },
+    });
+    if (exist) {
+      const secret =process.env.jwtSecret
+      const token = JWT.sign({
+        id: exist.id,
+       }, secret, { expiresIn: '3650d' });
+      
+       //login work
+       await User.update({isLogin: true},{where:{id:exist.id}})
+      return res.status(200).json({
+        token: token,
+      });
+    }
+    
+    const user = await User.create({
+      walletAddress:req.body.walletAddress,
+      udid: req.body.udid
+    });
+    if (req.body.referralCode) {
+      const user1 = await User.findOne({
+        attributes: ["id"],
+        where: { referral_code: req.body.referralCode },
+      });
+    if (user1) {
+        await ReferralHistory.create({
+          user1: user1.id,
+          user2: user.id,
+        }); 
+    }
+  
+
+ 
+    }
+    const secret =process.env.jwtSecret
+    const token = JWT.sign({
+      id: user.id,
+     }, secret, { expiresIn: '3650d' });
+    
+     //login work
+     await User.update({isLogin: true},{where:{id:user.id}})
+    return res.status(200).json({
+      token: token,
+    });
+  } catch (error) {
+    console.log("Error in Create::::", error);
+    if (res.headersSent) return;
+    return res.status(500).json({ msg: error.message });
+  }
+};
 
 exports.OtpCodeVerification = async (req, res) => {
     try {
       let user = await User.findOne({
-        where: { email: req.body.email},
+        where: { email: req.body.email,isMPC:true},
       }); // finding User In DB
       if (!user) {
         return res
@@ -154,7 +221,7 @@ exports.OtpCodeVerification = async (req, res) => {
 exports.resendOTP = async (req, res) => {
   try {
     const user = await User.findOne({
-      where: { email: req.body.email },
+      where: { email: req.body.email,isMPC:true },
     }); // finding User In DB
     if (!user) {
       return res
@@ -288,19 +355,16 @@ exports.setReferralCode = async (req, res) => {
     try {
       let user = req.user
       const exist = await User.findOne({
-        attributes: ["id"],
         where: {
           id: user.id,
         },
       });
-      
-      if (!exist) {
-        return res.status(401).json({
-          msg: "No user found ",
-        });
+      if(exist.referralCode)
+      {
+        return res.status(401).json({msg:"Code Already exsist"})
       }
       await User.update(
-        { referral_code: req.body.code ,walletAddress:req.body.walletAddress},
+        { referral_code: req.body.code },
         { where: { id: user.id } }
       );
     return res.status(200).json({
@@ -312,7 +376,42 @@ exports.setReferralCode = async (req, res) => {
     }
   };
 
-
+exports.setWalletAddress = async (req, res) => {
+    try {
+      let user = req.user
+      const exist = await User.findOne({
+        where: {
+          walletAddress: req.body.walletAddress,
+        },
+      });
+      if(exist)
+      {
+        return res.status(401).json({
+          msg: "This Wallet Address already set",
+        });
+      }
+      let userData = await User.findOne({
+        where: {
+          id: user.id,
+        },
+      });
+      if (userData.walletAddress) {
+        return res.status(401).json({
+          msg: "Wallet Address already set",
+        });
+      }
+      await User.update(
+        { walletAddress: req.body.walletAddress },
+        { where: { id: user.id } }
+      );
+    return res.status(200).json({
+        msg: "Updated",
+      });
+    } catch (error) {
+      console.log("Error in Create::::", error);
+      return res.status(500).json({ msg: error.message });
+    }
+  };
   exports.logout = async (req, res) => {
     try {
       let user = req.user

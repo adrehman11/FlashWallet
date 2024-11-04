@@ -40,6 +40,11 @@ const userModel = (sequelize) => {
         type: Sequelize.BOOLEAN,
         default:false
 
+      },
+      isMPC:{
+        type: Sequelize.BOOLEAN,
+        default:false
+
       }
 
     },

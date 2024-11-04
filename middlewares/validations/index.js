@@ -13,6 +13,20 @@ exports.signup = (req, res, next) => {
     next();
   }
 };
+const signupImportedWalletSchema = JOI.object().keys({
+  walletAddress: JOI.string().required(),
+  sign: JOI.string().required(),
+  referralCode:JOI.string().allow("").optional(),
+});
+
+exports.signupImportedWallet = (req, res, next) => {
+  const result = signupImportedWalletSchema.validate(req.body);
+  if (result.error) {
+    return res.status(400).json({ msg: result.error.message });
+  } else {
+    next();
+  }
+};
 const loginSchema = JOI.object().keys({
   email: JOI.string().regex(/[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9!#$%&'*+/=?^_`{|}~-]+\.[a-z0-9]{2,3}/).required(),
 });
@@ -28,11 +42,24 @@ exports.login = (req, res, next) => {
 
 const setReferralCodeSchema = JOI.object().keys({
   code: JOI.string().required().min(6).max(6),
-  walletAddress: JOI.string().required()
+  // walletAddress: JOI.string().required()
 });
 
 exports.setReferralCode = (req, res, next) => {
   const result = setReferralCodeSchema.validate(req.body);
+  if (result.error) {
+    return res.status(400).json({ msg: result.error.message });
+  } else {
+    next();
+  }
+};
+
+const setWalletAddressSchema = JOI.object().keys({
+  walletAddress: JOI.string().required()
+});
+
+exports.setWalletAddress = (req, res, next) => {
+  const result = setWalletAddressSchema.validate(req.body);
   if (result.error) {
     return res.status(400).json({ msg: result.error.message });
   } else {
