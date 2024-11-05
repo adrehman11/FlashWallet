@@ -7,6 +7,10 @@ const userModel = (sequelize) => {
         default:null
 
       },
+      profile_image: {
+        type: Sequelize.STRING,
+        default:null
+      },
       isActive:{
         type: Sequelize.BOOLEAN,
         default:false

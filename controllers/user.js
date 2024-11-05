@@ -461,3 +461,25 @@ exports.setWalletAddress = async (req, res) => {
       return res.status(500).json({ msg: error.message });
     }
   }
+
+  exports.profileSetting = async (req, res) => {
+    try {
+      let user = req.user
+      if (req.file) {
+        req.body.profile_image =req.file.location
+      }
+       await User.update(req.body,{where:{id:user.id}})
+       let userData = await User.findOne({
+         attribute:["id","walletAddress","referral_code","profile_image"],
+        where: { id: user.id }
+      });
+    return res.status(200).json({
+        msg: "Updated",
+        Data:userData
+
+      });
+    } catch (error) {
+      console.log("Error in profile setting::::", error);
+      return res.status(500).json({ msg: error.message });
+    }
+  };

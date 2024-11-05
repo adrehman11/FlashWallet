@@ -1,6 +1,7 @@
 var express = require('express');
 const Router = express.Router();
 const UserController = require("../controllers/user");
+const upload = require("../Helper/aws")
 const {
   signup,
   login,
@@ -27,6 +28,7 @@ Router.get("/secret_phrase",authMiddleware,UserController.get_secret_phrase)
 
 Router.post("/setReferralCode",authMiddleware,setReferralCode, UserController.setReferralCode );
 Router.post("/setWalletaddress",authMiddleware,setWalletAddress, UserController.setWalletAddress );
+Router.post("/profileSetting",authMiddleware, upload.single("image"),UserController.profileSetting );
 Router.get("/topReferrals",authMiddleware,UserController.topReferrals)
 Router.get("/logout",authMiddleware,UserController.logout)
 
