@@ -359,7 +359,7 @@ exports.setReferralCode = async (req, res) => {
           id: user.id,
         },
       });
-      if(exist.referralCode)
+      if(exist.referral_code)
       {
         return res.status(401).json({msg:"Code Already exsist"})
       }
