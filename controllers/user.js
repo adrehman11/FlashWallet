@@ -483,3 +483,41 @@ exports.setWalletAddress = async (req, res) => {
       return res.status(500).json({ msg: error.message });
     }
   };
+
+  exports.profileData = async (req, res) => {
+    try {
+      let user = req.user
+     let userData = await User.findOne({where:{id:user.id},attribute:["id","walletAddress","profile_image","referral_code","full_name"]})
+    return res.status(200).json({
+        Data:userData
+
+      });
+    } catch (error) {
+      console.log("Error in profile setting::::", error);
+      return res.status(500).json({ msg: error.message });
+    }
+  };
+
+  exports.checkReferralCode = async (req, res) => {
+    try {
+     let userData = await User.findOne({where:{referral_code:req.body.code}})
+     if(!userData)
+     {
+      return res.status(400).json({
+        msg:"No user found with this code"
+
+      });
+     }
+     else
+     {
+      return res.status(200).json({
+        msg:"User found"
+
+      });
+     }
+   
+    } catch (error) {
+      console.log("Error in check Refferalcode::::", error);
+      return res.status(500).json({ msg: error.message });
+    }
+  };

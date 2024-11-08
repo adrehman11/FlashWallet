@@ -30,6 +30,11 @@ Router.post("/setReferralCode",authMiddleware,setReferralCode, UserController.se
 Router.post("/setWalletaddress",authMiddleware,setWalletAddress, UserController.setWalletAddress );
 Router.post("/profileSetting",authMiddleware, upload.single("image"),UserController.profileSetting );
 Router.get("/topReferrals",authMiddleware,UserController.topReferrals)
+Router.get("/getProfileData",authMiddleware,UserController.profileData)
+Router.post("/checkReferralCode",setReferralCode,UserController.checkReferralCode)
+
+
+
 Router.get("/logout",authMiddleware,UserController.logout)
 
 
