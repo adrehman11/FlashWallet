@@ -439,7 +439,7 @@ exports.setWalletAddress = async (req, res) => {
         include: [
           {
             model: User,
-            attributes: ["full_name", "email", "walletAddress", "id"],
+            attributes: ["full_name", "email", "walletAddress", "id","profile_image"],
             required: true,
           },
         ],
