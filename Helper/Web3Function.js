@@ -1,14 +1,15 @@
 
 const axios = require('axios');
 const utils = require("ethereumjs-util");
-
+const Moralis = require('moralis').default
+Moralis.start({apiKey: process.env.MORALIS_API_KEY});
 
 async function CheckTransectionHistory (walletAddress,chainObject)
 {
     try{
       let todayDate = new Date();
       let oneMonthAgoDate = new Date();
-      oneMonthAgoDate.setMonth(todayDate.getMonth() - 10);
+      oneMonthAgoDate.setMonth(todayDate.getMonth() - 1);
       let todayFormatted = todayDate.toISOString().split('T')[0]
       let oneMonthAgoDateFormatted = oneMonthAgoDate.toISOString().split('T')[0]
         const query = `
@@ -65,34 +66,41 @@ async function CheckTransectionHistory (walletAddress,chainObject)
     }
 }
 
-async function CheckNftHistory (walletAddress,contractAddress)
+async function CheckNftHistory (walletAddress)
 {
   try
   {
-    const query = `
-{
-  EVM(network: eth) {
-    transfers: transfers() {
-      transaction {
-        hash
-      }
-    }
-  }
-}
+    const rankOrder = ["Bronze", "Silver", "Gold", "Legendary"];
+    const response = await Moralis.EvmApi.nft.getWalletNFTs({
+      "chain": "0x89",
+      "format": "decimal",
+      "tokenAddresses": [
+        process.env.NFT_CONTRACT_ADDRESS
+      ],
+      "mediaItems": false,
+      "address": walletAddress
+    });
+    let UserNFTRank =[]
+    if(response.raw.result)
+    {
+       for (let i =0 ; i< response.raw.result.length; i ++)
+        {
+         let metaData = JSON.parse(response.raw.result[i].metadata)
+         if (metaData.name.includes("Bronze")) {
+          UserNFTRank.push("Bronze");
+        } else if (metaData.name.includes("Silver")) {
+          UserNFTRank.push("Silver");
+        } else if (metaData.name.includes("Gold")) {
+          UserNFTRank.push("Gold");
+        } else if (metaData.name.includes("Legendary")) {
+          UserNFTRank.push("Legendary");
+        }
+        }
 
-`;
-    const response = await axios.post(
-      'https://graphql.bitquery.io',
-      { query },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-KEY': "BQYtndQyJgg5ih1s3FWsTYEhyVWY2jWB",
-        },
-      }
-    );
-    console.log(response.data.errors[0])
-    
+      
+    }
+    const highestRank = UserNFTRank.reduce((highest, current) => rankOrder.indexOf(current) > rankOrder.indexOf(highest) ? current : highest, "NO_RANK");
+    return highestRank
   }
   catch(error)
   {
@@ -100,8 +108,8 @@ async function CheckNftHistory (walletAddress,contractAddress)
   }
 }
 // setTimeout(async ()  =>  {
-//   let c = await CheckNftHistory("0xB09540Cdb198d8ae82710e95c53C6CDebc7680a8","0x0054ef36214005b3f3878536b07900002eb7f46c")
-//   console.log(c)
+//   let c = await CheckNftHistory("0xB09540Cdb198d8ae82710e95c53C6CDebc7680a8")
+//   // console.log(c)
 //   }, 3000);
 
 async function verifyEthSign(walletAddress, signature) {
