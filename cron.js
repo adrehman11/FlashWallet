@@ -6,7 +6,7 @@ exports.runCronJob = async () => {
     cron.schedule("0 * * * *", async () => {
         console.log("running a task every Hour");
         checkTransection()
-        // checkNFT()
+        checkNFT()
     });
 }
 async function checkTransection() {
