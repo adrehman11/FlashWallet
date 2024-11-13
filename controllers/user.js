@@ -525,11 +525,18 @@ exports.setWalletAddress = async (req, res) => {
   exports.getEarnedPoints = async (req, res) => {
     try {
       let user = req.user
-      let data = await ReferralHistory.findAll({where:{user1 :user.id,isClaimed:false}, attributes: [
+      let dataPoints = await ReferralHistory.findAll({where:{user1 :user.id,isClaimed:false}, attributes: [
         "id",
         [Sequelize.literal('referralPoints + NFTpoints'), 'totalPoints']
     ]})
-     return res.status(200).json(data)
+    let data = dataPoints.filter(item => item.get('totalPoints') > 0);
+    if(data.length > 0)
+    {
+      return res.status(200).json(data)
+    }
+     else{
+      return res.status(200).json({msg:"No Data Found"})
+     }
     } catch (error) {
       console.log("Error in check Refferalcode::::", error);
       return res.status(500).json({ msg: error.message });
@@ -539,7 +546,7 @@ exports.setWalletAddress = async (req, res) => {
   exports.ClaimEarnedPoints = async (req, res) => {
     try {
       let user = req.user
-      let data = await ReferralHistory.findOne({where:{id :req.body.id,isClaimed:false}, attributes: [
+      let data = await ReferralHistory.findOne({where:{id :req.body.id,isClaimed:false }, attributes: [
         "id",
         "user1",
         [Sequelize.literal('referralPoints + NFTpoints'), 'totalPoints']
