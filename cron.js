@@ -32,7 +32,7 @@ async function checkTransection() {
               if(checkTransectionsHistoryData)
               {
                 await User.update({isActive:true},{where:{id:isActiveData[i].referrer.id}})
-                await ReferralHistory.update({isActiveRewarded:true,referralPoints:points},{where:{id:isActiveData[i].id}})
+                await ReferralHistory.update({isActiveRewarded:true,referralPoints:100},{where:{id:isActiveData[i].id}})
                 // await FlashPoints.create({user_id:isActiveData[i].user1,points:100,description:"Earned 100 Points for referring a Active User"})
                 break ;
               }
@@ -98,7 +98,7 @@ async function checkNFT() {
     }
   }
 
-  // setTimeout(async ()  =>  {
-  //   checkNFT()
-  // }, 3000);
+  setTimeout(async ()  =>  {
+    checkTransection()
+  }, 3000);
   
