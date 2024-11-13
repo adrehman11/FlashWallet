@@ -130,3 +130,16 @@ exports.resendOTP = (req, res, next) => {
     next();
   }
 };
+
+const claimEarnedPointsSchema = JOI.object().keys({
+  id:JOI.string().required(),
+});
+
+exports.claimEarnedPoints = (req, res, next) => {
+  const result = claimEarnedPointsSchema.validate(req.body);
+  if (result.error) {
+    return res.status(400).json({ msg: result.error.message });
+  } else {
+    next();
+  }
+};

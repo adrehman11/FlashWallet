@@ -15,6 +15,7 @@ async function checkTransection() {
     let isActiveData = await ReferralHistory.findAll({
         where: {
           isActiveRewarded: false,
+          isClaimed:false,
           createdAt: {
             [Op.gte]: new Date(new Date() - 30 * 24 * 60 * 60 * 1000) // 30 days ago
           }
@@ -31,8 +32,8 @@ async function checkTransection() {
               if(checkTransectionsHistoryData)
               {
                 await User.update({isActive:true},{where:{id:isActiveData[i].referrer.id}})
-                await ReferralHistory.update({isActiveRewarded:true},{where:{id:isActiveData[i].id}})
-                await FlashPoints.create({user_id:isActiveData[i].user1,points:100,description:"Earned 100 Points for referring a Active User"})
+                await ReferralHistory.update({isActiveRewarded:true,referralPoints:points},{where:{id:isActiveData[i].id}})
+                // await FlashPoints.create({user_id:isActiveData[i].user1,points:100,description:"Earned 100 Points for referring a Active User"})
                 break ;
               }
             }
@@ -52,15 +53,16 @@ async function checkNFT() {
     let isActiveData = await ReferralHistory.findAll({
         where: {
           isNFTRewarded: false,
+          isClaimed:false,
           createdAt: {
             [Op.gte]: new Date(new Date() - 30 * 24 * 60 * 60 * 1000) // 30 days ago
           }
         },
-        include: [{ model: User, as: "referrer" }]
+        include: [{ model: User, as: "referrer",where:{isActive:true} }]
       });
       for (let i =0 ; i < isActiveData.length ; i ++)
       {
-          if(isActiveData[i].referrer.walletAddress)
+          if(isActiveData[i].referrer.walletAddress && isActiveData[i].referrer.isActive)
           {
                 let checkNFTHistoryData = await  CheckNftHistory(isActiveData[i].referrer.walletAddress);
                 let points = 0 ;
@@ -82,8 +84,8 @@ async function checkNFT() {
                 }
                 if(points != 0)
                 {
-                  await ReferralHistory.update({isNFTRewarded:true},{where:{id:isActiveData[i].id}})
-                  await FlashPoints.create({user_id:isActiveData[i].user1,points:points,description:`Earned Extra Points ${points} for having a NFT`})
+                  await ReferralHistory.update({isNFTRewarded:true,NFTpoints:points},{where:{id:isActiveData[i].id}})
+                  // await FlashPoints.create({user_id:isActiveData[i].user1,points:points,description:`Earned Extra Points ${points} for having a NFT`})
                 }
           }
           

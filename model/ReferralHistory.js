@@ -9,6 +9,18 @@ const referralHistoryModel = (sequelize) => {
         isNFTRewarded :{
             type: Sequelize.BOOLEAN,
             default:false
+        },
+        isClaimed :{
+            type: Sequelize.BOOLEAN,
+            default:false
+        },
+        NFTpoints:{
+            type: Sequelize.INTEGER,
+            default:0
+        },
+        referralPoints:{
+            type: Sequelize.INTEGER,
+            default:0
         }
     }, { timestamps: true });
     return ReferralHistory;

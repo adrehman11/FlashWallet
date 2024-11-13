@@ -521,3 +521,39 @@ exports.setWalletAddress = async (req, res) => {
       return res.status(500).json({ msg: error.message });
     }
   };
+
+  exports.getEarnedPoints = async (req, res) => {
+    try {
+      let user = req.user
+      let data = await ReferralHistory.findAll({where:{user1 :user.id,isClaimed:false}, attributes: [
+        "id",
+        [Sequelize.literal('referralPoints + NFTpoints'), 'totalPoints']
+    ]})
+     return res.status(200).json(data)
+    } catch (error) {
+      console.log("Error in check Refferalcode::::", error);
+      return res.status(500).json({ msg: error.message });
+    }
+  };
+
+  exports.ClaimEarnedPoints = async (req, res) => {
+    try {
+      let user = req.user
+      let data = await ReferralHistory.findOne({where:{id :req.body.id,isClaimed:false}, attributes: [
+        "id",
+        "user1",
+        [Sequelize.literal('referralPoints + NFTpoints'), 'totalPoints']
+    ]})
+    if(!data)
+    {
+      return res.status(400).json({ msg: "No Data found " });
+    }
+    await FlashPoints.create({user_id:data.user1,points:data.dataValues.totalPoints,description:`Earned ${data.dataValues.totalPoints} Points for referring a User`})
+    await ReferralHistory.update({isClaimed:true},{where:{id:req.body.id}})
+    
+     return res.status(200).json({msg:"claimed"})
+    } catch (error) {
+      console.log("Error in check Refferalcode::::", error);
+      return res.status(500).json({ msg: error.message });
+    }
+  };

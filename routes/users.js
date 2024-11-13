@@ -12,7 +12,8 @@ const {
   secret_phrase_3,
   resendOTP,
   signupImportedWallet,
-  setWalletAddress
+  setWalletAddress,
+  claimEarnedPoints
 
 } = require("../middlewares/validations");
 const authMiddleware = require("../middlewares/validations/auth");
@@ -31,6 +32,9 @@ Router.post("/setWalletaddress",authMiddleware,setWalletAddress, UserController.
 Router.post("/profileSetting",authMiddleware, upload.single("image"),UserController.profileSetting );
 Router.get("/topReferrals",authMiddleware,UserController.topReferrals)
 Router.get("/getProfileData",authMiddleware,UserController.profileData)
+Router.get("/ReferralPointsEarned",authMiddleware,UserController.getEarnedPoints)
+Router.post("/claimReferralPoints",authMiddleware,claimEarnedPoints,UserController.ClaimEarnedPoints)
+
 Router.post("/checkReferralCode",setReferralCode,UserController.checkReferralCode)
 
 
