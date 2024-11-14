@@ -363,6 +363,11 @@ exports.setReferralCode = async (req, res) => {
       {
         return res.status(401).json({msg:"Code Already exsist"})
       }
+      let codeAlreadyexsist = await User.findOne({where:{referral_code: req.body.code}})
+      if(codeAlreadyexsist)
+      {
+        return res.status(401).json({msg:"This Referral code is  Already exsist"})
+      }
       await User.update(
         { referral_code: req.body.code },
         { where: { id: user.id } }
