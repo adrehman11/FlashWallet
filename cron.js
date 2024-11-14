@@ -98,7 +98,7 @@ async function checkNFT() {
     }
   }
 
-  setTimeout(async ()  =>  {
-    checkNFT()
-  }, 3000);
+  // setTimeout(async ()  =>  {
+  //   checkNFT()
+  // }, 3000);
   
