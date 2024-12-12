@@ -40,6 +40,11 @@ const userModel = (sequelize) => {
         default:null
 
       },
+      udid:{
+        type: Sequelize.STRING,
+        default:null
+
+      },
       isLogin:{
         type: Sequelize.BOOLEAN,
         default:false

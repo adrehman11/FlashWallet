@@ -33,7 +33,7 @@ exports.createUserMPC = async (req, res) => {
       if (exist) {
         let otpCode = await otp_code()
         let otpCode_timestamp= Date.now()
-        await User.update({otpCode:otpCode,otpCode_timestamp:otpCode_timestamp},{where:{email:req.body.email}})
+        await User.update({otpCode:otpCode,otpCode_timestamp:otpCode_timestamp,udid:req.body.udid},{where:{email:req.body.email}})
 
          const msg = {
             to: req.body.email,
@@ -55,33 +55,25 @@ exports.createUserMPC = async (req, res) => {
 
       const user = await User.create({
         email:req.body.email,
-        isMPC: true
+        isMPC: true,
+        udid:req.body.udid
       });
       if (req.body.referralCode) {
+        //check if the udid is same or not
         const user1 = await User.findOne({
-          attributes: ["id"],
+          attributes: ["id","udid"],
           where: { referral_code: req.body.referralCode },
         });
+        let allReferralData = await ReferralHistory.findAll({where:{user1:user1.id},include:[{model:User,as:"referee",attributes:["udid"]}]})
+        const isUdidPresent = allReferralData.some(referral => referral.dataValues.referee.udid === req.body.udid);
       if (user1) {
+        if(user1.udid != req.body.udid && !isUdidPresent)
+        {
           await ReferralHistory.create({
             user1: user1.id,
             user2: user.id,
           });
-      // if(!user1.isActive)
-      // {
-      //   let chainArray = [{chain:`ethereum(network: ethereum)`,symbol:"ethereum"},{chain:`bsc: ethereum(network: bsc)`,symbol:"bsc"},{chain:`polygon: ethereum(network: polygon)",symbol:"polygon`}]
-      //   for (let i =0 ; i < chainArray.length ; i ++)
-      //   {
-      //     let checkTransectionsHistoryData = await CheckTransectionHistory (user1.walletAddress,chainArray[i]);
-      //     if(checkTransectionsHistoryData)
-      //     {
-      //       await User.update({isActive:true},{where:{id:user1.id}})
-      //       break ;
-      //     }
-      //   }
-      // }
-      
-     
+        }
       }
     
 
@@ -118,7 +110,6 @@ exports.createUserMPC = async (req, res) => {
 exports.createUserImportedWallet = async (req, res) => {
   try {
     let verifyRSVToken = await verifyEthSign(req.body.walletAddress,req.body.sign)
-    console.log(verifyRSVToken)
     if(!verifyRSVToken)
     {
       return res.status(400).json({
@@ -150,14 +141,17 @@ exports.createUserImportedWallet = async (req, res) => {
     });
     if (req.body.referralCode) {
       const user1 = await User.findOne({
-        attributes: ["id"],
+        attributes: ["id","udid"],
         where: { referral_code: req.body.referralCode },
       });
     if (user1) {
+      if(user1.udid != req.body.udid)
+      {
         await ReferralHistory.create({
           user1: user1.id,
           user2: user.id,
-        }); 
+        });
+      }
     }
   
 

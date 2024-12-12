@@ -3,6 +3,7 @@ const JOI = require("@hapi/joi");
 const signupSchema = JOI.object().keys({
   email: JOI.string().regex(/[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9!#$%&'*+/=?^_`{|}~-]+\.[a-z0-9]{2,3}/).required(),
   referralCode:JOI.string().allow("").optional(),
+  udid:JOI.string().required(),
 });
 
 exports.signup = (req, res, next) => {
@@ -17,6 +18,7 @@ const signupImportedWalletSchema = JOI.object().keys({
   walletAddress: JOI.string().required(),
   sign: JOI.string().required(),
   referralCode:JOI.string().allow("").optional(),
+  udid:JOI.string().required(),
 });
 
 exports.signupImportedWallet = (req, res, next) => {
