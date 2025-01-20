@@ -563,3 +563,78 @@ exports.setWalletAddress = async (req, res) => {
       return res.status(500).json({ msg: error.message });
     }
   };
+  exports.createpaylinkwebhook = async (req,res) =>{
+    try
+    {
+      const paylinkId = "67627ec57cd45e1098223f5d";
+    const targetUrl =
+      "http://ec2-18-219-208-61.us-east-2.compute.amazonaws.com:3000/users/webhook/check";
+    const events= ["STARTED", "ENDED"]
+      const response = await axios.post(
+        "https://api.hel.io/v1/webhook/stream/transaction",
+        {
+          "streamId": "67627ec57cd45e1098223f5d",
+          "targetUrl": "http://ec2-18-219-208-61.us-east-2.compute.amazonaws.com:3000/users/webhook/check",
+          "events": ["STARTED", "ENDED"]
+       },
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer X01mmVfmiOFU/e8vuozSbG5ZP38wCDnJIgOt9Kjy7Y4A7jTWnYhK+IdB6WznH3Hi0fjsQJXvo22Nb8VAFhKsn3+jwlg5UFZf6E8nw5j0CUqSGD1UB92ttL8Fmf68k/yJ`,
+            "cache-control": "no-cache",
+          },
+          params: {
+            apiKey: "m8ciibQ3rhBrz6FoE7pXSEE3mwGx9e0FsNm16sULMfyGR_ZFCHyjs9F.UbZmKQFs",
+          },
+        },
+      );
+        console.log(response.data)
+      // return new Response(JSON.stringify(response.data), {
+      //   status: 200,
+      // });
+    }
+    catch(error)
+    {
+      console.log(error)
+    }
+  }
+  exports.webhook = async (req, res) => {
+    try {
+    console.log(req.body)
+     return res.status(200).json({msg:"claimed"})
+    } catch (error) {
+      console.log("Error in check Refferalcode::::", error);
+      return res.status(500).json({ msg: error.message });
+    }
+  };
+
+  exports.list = async (req,res) =>{
+    try
+    {
+      const paylinkId = "67627ec57cd45e1098223f5d";
+   
+      const response = await axios.get(
+        "https://api.hel.io/v1/webhook/stream/transaction?apiKey=m8ciibQ3rhBrz6FoE7pXSEE3mwGx9e0FsNm16sULMfyGR_ZFCHyjs9F.UbZmKQFs&streamId=67627ec57cd45e1098223f5d",
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: `Bearer X01mmVfmiOFU/e8vuozSbG5ZP38wCDnJIgOt9Kjy7Y4A7jTWnYhK+IdB6WznH3Hi0fjsQJXvo22Nb8VAFhKsn3+jwlg5UFZf6E8nw5j0CUqSGD1UB92ttL8Fmf68k/yJ`,
+            "cache-control": "no-cache",
+          },
+          params: {
+            apiKey: "m8ciibQ3rhBrz6FoE7pXSEE3mwGx9e0FsNm16sULMfyGR_ZFCHyjs9F.UbZmKQFs",
+          },
+        },
+      );
+        console.log(response.data)
+      // return new Response(JSON.stringify(response.data), {
+      //   status: 200,
+      // });
+    }
+    catch(error)
+    {
+      console.log(error)
+    }
+  }
