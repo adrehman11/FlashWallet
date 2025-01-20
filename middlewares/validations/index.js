@@ -82,30 +82,6 @@ exports.secret_phrase_1 = (req, res, next) => {
     next();
   }
 };
-const secret_phrase_2_Schema = JOI.object().keys({
-  "secret_phrase_2": JOI.string().required(),
-});
-
-exports.secret_phrase_2 = (req, res, next) => {
-  const result = secret_phrase_2_Schema.validate(req.body);
-  if (result.error) {
-    return res.status(400).json({ msg: result.error.message });
-  } else {
-    next();
-  }
-};
-const secret_phrase_3_Schema = JOI.object().keys({
-  "secret_phrase_3": JOI.string().required(),
-});
-
-exports.secret_phrase_3 = (req, res, next) => {
-  const result = secret_phrase_3_Schema.validate(req.body);
-  if (result.error) {
-    return res.status(400).json({ msg: result.error.message });
-  } else {
-    next();
-  }
-};
 const verifyOtpSchema = JOI.object().keys({
   otpCode: JOI.number().required(),
   email: JOI.string().regex(/[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9!#$%&'*+/=?^_`{|}~-]+\.[a-z0-9]{2,3}/).required()

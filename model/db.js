@@ -3,8 +3,6 @@ require("dotenv").config();
 const userModel = require("./User");
 const ReferralHistoryModel = require("./ReferralHistory");
 const SecretPhrase1Model = require("./SecretPhrase1");
-const SecretPhrase2Model = require("./SecretPhrase2");
-const SecretPhrase3Model = require("./SecretPhrase3");
 const FlashPointsModel = require("./FlashPoints");
 
 
@@ -47,8 +45,6 @@ if (!sequelize) {
 const ReferralHistory = ReferralHistoryModel(sequelize);
 const User = userModel(sequelize);
 const SecretPhrase1 = SecretPhrase1Model(sequelize);
-const SecretPhrase2 = SecretPhrase2Model(sequelize);
-const SecretPhrase3 = SecretPhrase3Model(sequelize);
 const FlashPoints = FlashPointsModel(sequelize);
 
 
@@ -94,26 +90,6 @@ sequelize
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });
-    SecretPhrase2.belongsTo(User, {
-      foreignKey: "user_id",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE",
-    });
-    User.hasOne(SecretPhrase2, {
-      foreignKey: "user_id",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE",
-    });
-    SecretPhrase3.belongsTo(User, {
-      foreignKey: "user_id",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE",
-    });
-    User.hasOne(SecretPhrase3, {
-      foreignKey: "user_id",
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE",
-    });
 
     FlashPoints.belongsTo(User, {
       foreignKey: "user_id",
@@ -137,8 +113,6 @@ module.exports = {
   Sequelize,
   User,
   ReferralHistory,
-  SecretPhrase3,
-  SecretPhrase2,
   SecretPhrase1,
   FlashPoints
 };
