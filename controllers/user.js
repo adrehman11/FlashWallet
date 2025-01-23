@@ -105,12 +105,21 @@ exports.createUserMPC = async (req, res) => {
       otpCode,
       },
   };
-
+  try{
     await sgMail.send(msg);
     return res.status(200).json({
         msg: "OTP Sended",
         // token:token
       });
+  }
+  catch(err)
+  {
+    return res.status(200).json({
+      msg: "OTP Sended",
+      // token:token
+    });
+  }
+   
     } catch (error) {
       console.log("Error in Create::::", error.response.body);
       if (res.headersSent) return;
