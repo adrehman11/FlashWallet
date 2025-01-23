@@ -30,6 +30,7 @@ exports.createUserMPC = async (req, res) => {
           isMPC:true
         },
       });
+
       if (exist) {
         let otpCode = await otp_code()
         let otpCode_timestamp= Date.now()
@@ -46,11 +47,21 @@ exports.createUserMPC = async (req, res) => {
             otpCode,
             },
         };
-         await sgMail.send(msg);
-        return res.status(200).json({
-          msg: "OTP Sended",
-          // token:token
-        });
+        try{
+          await sgMail.send(msg);
+          return res.status(200).json({
+            msg: "OTP Sended",
+            // token:token
+          });
+        }
+        catch(err)
+        {
+          return res.status(200).json({
+            msg: "OTP Sended",
+            // token:token
+          });
+        }
+         
       }
 
       const user = await User.create({
@@ -101,7 +112,7 @@ exports.createUserMPC = async (req, res) => {
         // token:token
       });
     } catch (error) {
-      console.log("Error in Create::::", error);
+      console.log("Error in Create::::", error.response.body);
       if (res.headersSent) return;
       return res.status(500).json({ msg: error.message });
     }
