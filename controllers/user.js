@@ -20,6 +20,9 @@ const sgMail = require("@sendgrid/mail");
 const moment = require('moment');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+const path = require("path");
+const fs = require("fs");
+
 const {verifyEthSign}  = require("../Helper/Web3Function")
 exports.createUserMPC = async (req, res) => {
     try {
@@ -540,6 +543,29 @@ exports.setWalletAddress = async (req, res) => {
       return res.status(500).json({ msg: error.message });
     }
   };
+
+
+  
+  exports.getTokens = async (req, res) => {
+    try {
+      // Resolve the path to your tokens.json file
+      const filePath = path.join(__dirname, "../tokens.json");
+  
+      // Read the file synchronously (you can also use async version)
+      const data = fs.readFileSync(filePath, "utf-8");
+  
+      // Parse the JSON data
+      const tokens = JSON.parse(data);
+  
+      // Send the JSON response
+      return res.status(200).json(tokens);
+  
+    } catch (error) {
+      console.log("Error in getTokens::::", error);
+      return res.status(500).json({ msg: error.message });
+    }
+  };
+
 
   exports.getEarnedPoints = async (req, res) => {
     try {

@@ -38,6 +38,11 @@ Router.post("/claimReferralPoints",authMiddleware,claimEarnedPoints,UserControll
 Router.post("/checkReferralCode",setReferralCode,UserController.checkReferralCode)
 
 
+
+Router.post("/getTokens",UserController.getTokens)
+
+
+
 //webhook end point for subscription
 
 Router.post("/webhook/check",UserController.webhook)
