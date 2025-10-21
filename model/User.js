@@ -54,7 +54,9 @@ const userModel = (sequelize) => {
         type: Sequelize.BOOLEAN,
         default:false
 
-      }
+      },
+      otpAttempts: { type: Sequelize.INTEGER, defaultValue: 0 },
+      otpLockedUntil: { type: Sequelize.DATE, allowNull: true },
 
     },
     { timestamps: true }
